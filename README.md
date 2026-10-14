@@ -2,7 +2,7 @@
 
 Estimating the rotor-magnet and stator temperatures of an electric-vehicle motor (PMSM) from signals a car can actually measure — and an LLM assistant that answers engineering questions by calling the model.
 
-**Live demo:** _coming soon_ · **Case study:** [meetbabariya.github.io/work/emotor-virtual-sensor](https://meetbabariya.github.io)
+**Interactive case study:** [meetbabariya.github.io/work/emotor-virtual-sensor](https://meetbabariya.github.io/work/emotor-virtual-sensor/) — explore the test cycles, the hot-restart slider, what-if scenarios and the recorded assistant runs in your browser.
 
 | | This project | Best published model |
 |---|---|---|
