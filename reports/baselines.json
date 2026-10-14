@@ -1,0 +1,46 @@
+[
+  {
+    "model": "Ridge (OLS + EWMA) [no torque]",
+    "mse_pm": 23.945567351289274,
+    "mse_stator_yoke": 3.896815708561609,
+    "mse_stator_tooth": 6.6860384556220644,
+    "mse_stator_winding": 10.382134130516611,
+    "mse_avg": 11.22763891149739,
+    "linf": 25.809192588322873,
+    "linf_pm": 22.198474776219534,
+    "fit_s": 2.3
+  },
+  {
+    "model": "Gradient boosting + EWMA [no torque]",
+    "mse_pm": 14.719832053682794,
+    "mse_stator_yoke": 5.1122079929980515,
+    "mse_stator_tooth": 6.849548371021538,
+    "mse_stator_winding": 12.157829032164885,
+    "mse_avg": 9.709854362466817,
+    "linf": 17.257846685688094,
+    "linf_pm": 16.82767043191383,
+    "fit_s": 121.6
+  },
+  {
+    "model": "Ridge (OLS + EWMA) [with torque]",
+    "mse_pm": 23.319841600131014,
+    "mse_stator_yoke": 3.942333478959054,
+    "mse_stator_tooth": 6.666905465653725,
+    "mse_stator_winding": 10.248227680619415,
+    "mse_avg": 11.0443270563408,
+    "linf": 26.093833854192013,
+    "linf_pm": 22.296190818207144,
+    "fit_s": 23.5
+  },
+  {
+    "model": "Gradient boosting + EWMA [with torque]",
+    "mse_pm": 14.567445695106562,
+    "mse_stator_yoke": 5.022046198700713,
+    "mse_stator_tooth": 7.106157295702977,
+    "mse_stator_winding": 11.855804330146626,
+    "mse_avg": 9.637863379914219,
+    "linf": 17.664130770197467,
+    "linf_pm": 17.664130770197467,
+    "fit_s": 123.3
+  }
+]

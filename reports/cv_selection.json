@@ -1,0 +1,172 @@
+[
+  {
+    "model": "ridge",
+    "spans": "short (7\u201353 min)",
+    "std": false,
+    "alpha": 0.1,
+    "cv_mse": 11.82614033450985,
+    "cv_mse_pm": 25.5993326258018,
+    "cv_linf": 81.0975399017334
+  },
+  {
+    "model": "ridge",
+    "spans": "short (7\u201353 min)",
+    "std": false,
+    "alpha": 1.0,
+    "cv_mse": 10.98495916450421,
+    "cv_mse_pm": 25.608391209730552,
+    "cv_linf": 80.96261405944824
+  },
+  {
+    "model": "ridge",
+    "spans": "short (7\u201353 min)",
+    "std": false,
+    "alpha": 10.0,
+    "cv_mse": 9.438103117008065,
+    "cv_mse_pm": 24.52469160522268,
+    "cv_linf": 80.8272533416748
+  },
+  {
+    "model": "ridge",
+    "spans": "short (7\u201353 min)",
+    "std": true,
+    "alpha": 0.1,
+    "cv_mse": 7.120881287846656,
+    "cv_mse_pm": 17.156015378349153,
+    "cv_linf": 82.54851418027141
+  },
+  {
+    "model": "ridge",
+    "spans": "short (7\u201353 min)",
+    "std": true,
+    "alpha": 1.0,
+    "cv_mse": 7.098272060647555,
+    "cv_mse_pm": 17.126282393353687,
+    "cv_linf": 82.13943367490032
+  },
+  {
+    "model": "ridge",
+    "spans": "short (7\u201353 min)",
+    "std": true,
+    "alpha": 10.0,
+    "cv_mse": 6.85222475113467,
+    "cv_mse_pm": 16.426017586472017,
+    "cv_linf": 79.38598518857219
+  },
+  {
+    "model": "ridge",
+    "spans": "long (11\u201379 min)",
+    "std": false,
+    "alpha": 0.1,
+    "cv_mse": 27.771878687135274,
+    "cv_mse_pm": 24.304904098125977,
+    "cv_linf": 78.86875841897442
+  },
+  {
+    "model": "ridge",
+    "spans": "long (11\u201379 min)",
+    "std": false,
+    "alpha": 1.0,
+    "cv_mse": 13.595162412681193,
+    "cv_mse_pm": 25.253151225855003,
+    "cv_linf": 78.57568168640137
+  },
+  {
+    "model": "ridge",
+    "spans": "long (11\u201379 min)",
+    "std": false,
+    "alpha": 10.0,
+    "cv_mse": 10.627863985496143,
+    "cv_mse_pm": 25.21910632458205,
+    "cv_linf": 78.2837963104248
+  },
+  {
+    "model": "ridge",
+    "spans": "long (11\u201379 min)",
+    "std": true,
+    "alpha": 0.1,
+    "cv_mse": 7.6749248182137535,
+    "cv_mse_pm": 15.642049639463607,
+    "cv_linf": 70.04544639587402
+  },
+  {
+    "model": "ridge",
+    "spans": "long (11\u201379 min)",
+    "std": true,
+    "alpha": 1.0,
+    "cv_mse": 7.784315480932321,
+    "cv_mse_pm": 16.269678037851026,
+    "cv_linf": 74.76318245419719
+  },
+  {
+    "model": "ridge",
+    "spans": "long (11\u201379 min)",
+    "std": true,
+    "alpha": 10.0,
+    "cv_mse": 7.868643626560198,
+    "cv_mse_pm": 16.964861571377696,
+    "cv_linf": 77.13216648085557
+  },
+  {
+    "model": "ridge",
+    "spans": "wide (4\u201379 min)",
+    "std": false,
+    "alpha": 0.1,
+    "cv_mse": 10.773043296094336,
+    "cv_mse_pm": 26.45093348562148,
+    "cv_linf": 80.64484214782715
+  },
+  {
+    "model": "ridge",
+    "spans": "wide (4\u201379 min)",
+    "std": false,
+    "alpha": 1.0,
+    "cv_mse": 10.683416168277564,
+    "cv_mse_pm": 26.442837117134452,
+    "cv_linf": 80.64802360534668
+  },
+  {
+    "model": "ridge",
+    "spans": "wide (4\u201379 min)",
+    "std": false,
+    "alpha": 10.0,
+    "cv_mse": 10.20286410714318,
+    "cv_mse_pm": 26.133861318774947,
+    "cv_linf": 80.67858695983887
+  },
+  {
+    "model": "ridge",
+    "spans": "wide (4\u201379 min)",
+    "std": true,
+    "alpha": 0.1,
+    "cv_mse": 7.248325735542913,
+    "cv_mse_pm": 17.470166921309236,
+    "cv_linf": 83.5499784241715
+  },
+  {
+    "model": "ridge",
+    "spans": "wide (4\u201379 min)",
+    "std": true,
+    "alpha": 1.0,
+    "cv_mse": 7.273666323342363,
+    "cv_mse_pm": 17.554512778188446,
+    "cv_linf": 83.61493568906047
+  },
+  {
+    "model": "ridge",
+    "spans": "wide (4\u201379 min)",
+    "std": true,
+    "alpha": 10.0,
+    "cv_mse": 7.269898766718964,
+    "cv_mse_pm": 17.584202546246406,
+    "cv_linf": 83.13455086240032
+  },
+  {
+    "model": "hgb",
+    "spans": "short (7\u201353 min)",
+    "std": true,
+    "cv_mse": 8.539867518529386,
+    "cv_mse_pm": 13.103500320246084,
+    "cv_linf": 79.22810954559644
+  }
+]

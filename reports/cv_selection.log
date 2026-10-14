@@ -1,0 +1,22 @@
+ridge  short (7–53 min)   std=False a=0.1   CV MSE 11.83  pm 25.60  l∞ 81.1
+ridge  short (7–53 min)   std=False a=1.0   CV MSE 10.98  pm 25.61  l∞ 81.0
+ridge  short (7–53 min)   std=False a=10.0  CV MSE 9.44  pm 24.52  l∞ 80.8
+ridge  short (7–53 min)   std=True  a=0.1   CV MSE 7.12  pm 17.16  l∞ 82.5
+ridge  short (7–53 min)   std=True  a=1.0   CV MSE 7.10  pm 17.13  l∞ 82.1
+ridge  short (7–53 min)   std=True  a=10.0  CV MSE 6.85  pm 16.43  l∞ 79.4
+ridge  long (11–79 min)   std=False a=0.1   CV MSE 27.77  pm 24.30  l∞ 78.9
+ridge  long (11–79 min)   std=False a=1.0   CV MSE 13.60  pm 25.25  l∞ 78.6
+ridge  long (11–79 min)   std=False a=10.0  CV MSE 10.63  pm 25.22  l∞ 78.3
+ridge  long (11–79 min)   std=True  a=0.1   CV MSE 7.67  pm 15.64  l∞ 70.0
+ridge  long (11–79 min)   std=True  a=1.0   CV MSE 7.78  pm 16.27  l∞ 74.8
+ridge  long (11–79 min)   std=True  a=10.0  CV MSE 7.87  pm 16.96  l∞ 77.1
+ridge  wide (4–79 min)    std=False a=0.1   CV MSE 10.77  pm 26.45  l∞ 80.6
+ridge  wide (4–79 min)    std=False a=1.0   CV MSE 10.68  pm 26.44  l∞ 80.6
+ridge  wide (4–79 min)    std=False a=10.0  CV MSE 10.20  pm 26.13  l∞ 80.7
+ridge  wide (4–79 min)    std=True  a=0.1   CV MSE 7.25  pm 17.47  l∞ 83.5
+ridge  wide (4–79 min)    std=True  a=1.0   CV MSE 7.27  pm 17.55  l∞ 83.6
+ridge  wide (4–79 min)    std=True  a=10.0  CV MSE 7.27  pm 17.58  l∞ 83.1
+Python(87618) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+hgb    short (7–53 min)   std=True          CV MSE 8.54  pm 13.10  l∞ 79.2  (821s)
+
+Best ridge: {'model': 'ridge', 'spans': 'short (7–53 min)', 'std': True, 'alpha': 10.0, 'cv_mse': 6.85222475113467, 'cv_mse_pm': 16.426017586472017, 'cv_linf': 79.38598518857219}

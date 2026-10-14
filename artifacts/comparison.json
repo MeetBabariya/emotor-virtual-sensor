@@ -1,0 +1,66 @@
+{
+  "chosen_on_val": "ensemble",
+  "tnn_checkpoint": "tnn_seed1_cont.pt",
+  "scores": {
+    "val_known_ridge+corr": {
+      "mse_avg": 3.41,
+      "mse_pm": 4.77,
+      "linf": 14.64
+    },
+    "val_known_tnn": {
+      "mse_avg": 3.57,
+      "mse_pm": 5.41,
+      "linf": 19.39
+    },
+    "val_known_ensemble": {
+      "mse_avg": 2.06,
+      "mse_pm": 2.81,
+      "linf": 14.48
+    },
+    "val_cold_ridge+corr": {
+      "mse_avg": 4.53,
+      "mse_pm": 9.03,
+      "linf": 31.98
+    },
+    "val_cold_tnn": {
+      "mse_avg": 4.71,
+      "mse_pm": 9.44,
+      "linf": 32.18
+    },
+    "val_cold_ensemble": {
+      "mse_avg": 3.17,
+      "mse_pm": 6.86,
+      "linf": 31.98
+    },
+    "test_known_ridge+corr": {
+      "mse_avg": 2.09,
+      "mse_pm": 3.6,
+      "linf": 7.76
+    },
+    "test_known_tnn": {
+      "mse_avg": 2.7,
+      "mse_pm": 3.2,
+      "linf": 8.51
+    },
+    "test_known_ensemble": {
+      "mse_avg": 1.5,
+      "mse_pm": 1.37,
+      "linf": 5.73
+    },
+    "test_cold_ridge+corr": {
+      "mse_avg": 2.37,
+      "mse_pm": 4.61,
+      "linf": 11.19
+    },
+    "test_cold_tnn": {
+      "mse_avg": 2.85,
+      "mse_pm": 3.77,
+      "linf": 8.33
+    },
+    "test_cold_ensemble": {
+      "mse_avg": 1.72,
+      "mse_pm": 2.17,
+      "linf": 7.38
+    }
+  }
+}

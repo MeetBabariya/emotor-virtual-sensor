@@ -1,0 +1,10 @@
+{
+  "model": "ridge (short (7\u201353 min), std=True)",
+  "mse_pm": 3.620114605681435,
+  "mse_stator_yoke": 1.5214804727867832,
+  "mse_stator_tooth": 1.9379101112288968,
+  "mse_stator_winding": 2.2400421476421584,
+  "mse_avg": 2.3298868343348182,
+  "linf": 17.08638171565012,
+  "linf_pm": 17.08638171565012
+}

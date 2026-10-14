@@ -1,0 +1,15 @@
+PASS  overheat_measured        1 tools   10.2s  
+PASS  sensor_misses            2 tools   15.1s  
+PASS  peak_74                  1 tools    7.0s  
+PASS  error_60                 1 tools    6.8s  
+PASS  whatif_coolant           1 tools   11.5s  
+PASS  whatif_current           1 tools   12.7s  
+PASS  longest                  1 tools   11.8s  
+PASS  hot_restarts             1 tools   11.8s  
+PASS  winding_130              1 tools    8.1s  
+PASS  speed_65                 1 tools    9.0s  
+PASS  accuracy_vs_published    1 tools    6.9s  
+PASS  nonexistent_cycle        1 tools    6.7s  
+FAIL  out_of_scope             1 tools    5.7s  text_0
+
+12/13 passed · 22,449 in / 1,741 out tokens · ≈$0.00

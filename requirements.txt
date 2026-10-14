@@ -1,0 +1,15 @@
+# Runtime for the demo app and the full pipeline (versions tested together)
+streamlit==1.53.0
+plotly==6.4.0
+pandas==2.2.2
+numpy==2.5.2
+scikit-learn==1.5.1        # must match the version that pickled artifacts/virtual_sensor.joblib
+torch==2.14.1
+joblib==1.5.3
+pyarrow==20.0.0
+google-genai==2.30.1
+python-dotenv==1.2.2
+httpcore==1.0.9
+# optional: Claude backend (LLM_PROVIDER=claude) and training figures
+anthropic==1.13.0
+matplotlib==3.11.0
