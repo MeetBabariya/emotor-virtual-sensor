@@ -147,8 +147,27 @@ def regrade() -> None:
     print(f"{d['summary']['passed']}/{d['summary']['total']} passed (regraded)")
 
 
+def ask_endpoint(url: str, question: str, origin: str = "https://meetbabariya.github.io"):
+    """Ask the deployed (or locally served) web assistant; returns an object shaped like assistant.Result."""
+    import urllib.request
+    from types import SimpleNamespace
+
+    import os
+
+    headers = {"content-type": "application/json", "origin": origin}
+    if os.getenv("EVAL_TOKEN"):
+        headers["x-eval-token"] = os.environ["EVAL_TOKEN"]
+    req = urllib.request.Request(url, data=json.dumps({"question": question}).encode(), headers=headers)
+    with urllib.request.urlopen(req, timeout=120) as r:
+        d = json.load(r)
+    return SimpleNamespace(answer=d["answer"], tool_calls=d["tool_calls"], input_tokens=d.get("input_tokens", 0),
+                           output_tokens=d.get("output_tokens", 0), seconds=round(d["seconds"], 1), stop_reason="completed")
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--endpoint", default=None, help="grade a web deployment instead, e.g. http://localhost:3001/api/ask")
+    ap.add_argument("--origin", default="https://meetbabariya.github.io")
     ap.add_argument("--only", type=int, default=None, help="run only case number N (0-based)")
     ap.add_argument("--regrade", action="store_true", help="re-grade stored answers, no model calls")
     a = ap.parse_args()
@@ -162,7 +181,7 @@ def main():
         if i and PROVIDER == "gemini":
             time.sleep(6)  # stay inside free-tier requests-per-minute limits
         try:
-            r = ask_with_deadline(c.question)
+            r = ask_endpoint(a.endpoint, c.question, a.origin) if a.endpoint else ask_with_deadline(c.question)
         except Exception as e:  # count infrastructure failures, don't crash the run
             rows.append({"id": c.id, "question": c.question, "passed": False, "checks": {"error": False},
                          "answer": f"ERROR {type(e).__name__}: {e}", "tool_calls": [], "seconds": 0, "stop_reason": "error"})
@@ -178,7 +197,10 @@ def main():
     summary = {"provider": PROVIDER, "model": MODEL, "passed": sum(r["passed"] for r in rows), "total": len(rows),
                "input_tokens": tin, "output_tokens": tout, "approx_cost_usd": round(cost, 2),
                "run_at": time.strftime("%Y-%m-%d %H:%M")}
-    (ROOT / "reports" / "assistant_eval.json").write_text(json.dumps({"summary": summary, "cases": rows}, indent=2))
+    if a.endpoint:
+        summary["endpoint"] = a.endpoint
+    out_name = "assistant_eval_web.json" if a.endpoint else "assistant_eval.json"
+    (ROOT / "reports" / out_name).write_text(json.dumps({"summary": summary, "cases": rows}, indent=2))
     print(f"\n{summary['passed']}/{summary['total']} passed · {tin:,} in / {tout:,} out tokens · ≈${cost:.2f}")
 
 

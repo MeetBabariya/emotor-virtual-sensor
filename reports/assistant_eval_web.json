@@ -1,0 +1,296 @@
+{
+  "summary": {
+    "provider": "gemini",
+    "model": "gemini-3.1-flash-lite",
+    "passed": 13,
+    "total": 13,
+    "input_tokens": 22724,
+    "output_tokens": 1850,
+    "approx_cost_usd": 0.0,
+    "run_at": "2026-10-15 01:13",
+    "endpoint": "http://localhost:3001/api/ask"
+  },
+  "cases": [
+    {
+      "id": "overheat_measured",
+      "question": "Which drive cycles actually pushed the magnet above 100 \u00b0C in the lab measurements?",
+      "passed": true,
+      "checks": {
+        "ids_present": true,
+        "tool:find_overheating": true
+      },
+      "answer": "Four drive cycles pushed the magnet temperature above 100 \u00b0C according to lab measurements:\n\n| Profile ID | Split | Peak Magnet Temp (\u00b0C) | Minutes > 100 \u00b0C |\n| :--- | :--- | :--- | :--- |\n| 24 | train | 113.6 | 51.3 |\n| 27 | train | 109.3 | 22.8 |\n| 20 | validation | 105.9 | 8.8 |\n| 31 | train | 102.1 | 3.6 |\n\nPlease note that cycles in the \"train\" and \"validation\" splits were seen during the development of the virtual sensor, so performance estimates for these cycles may be optimistic.",
+      "tool_calls": [
+        {
+          "name": "find_overheating",
+          "input": {
+            "component": "magnet",
+            "threshold_c": 100,
+            "source": "measured"
+          },
+          "error": false
+        }
+      ],
+      "seconds": 5.7,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "sensor_misses",
+      "question": "If a car relied on the virtual sensor with a 100 \u00b0C magnet limit, would it have caught every drive cycle where the real magnet went above 100 \u00b0C?",
+      "passed": true,
+      "checks": {
+        "ids_present": true,
+        "text_0": true,
+        "tool:find_overheating": true
+      },
+      "answer": "No, the virtual sensor would not have caught every instance. While it correctly identified cycles 24, 27, and 20 as exceeding the 100 \u00b0C threshold, it failed to flag cycle 31.\n\nIn cycle 31, the real magnet temperature reached a measured peak of 102.1 \u00b0C, but the virtual sensor did not estimate a temperature above 100 \u00b0C for that cycle.\n\n| Profile ID | Real Peak (\u00b0C) | Virtual Peak (\u00b0C) | Split |\n| :--- | :--- | :--- | :--- |\n| 24 | 113.6 | 113.1 | Train |\n| 27 | 109.3 | 110.9 | Train |\n| 20 | 105.9 | 103.0 | Validation |\n| 31 | 102.1 | < 100.0 | Train |\n\nPlease note that cycles 24, 27, and 31 are in the training split, and cycle 20 is in the validation split. Performance on these cycles is generally more optimistic than on unseen test data.",
+      "tool_calls": [
+        {
+          "name": "find_overheating",
+          "input": {
+            "component": "magnet",
+            "threshold_c": 100,
+            "source": "measured"
+          },
+          "error": false
+        },
+        {
+          "name": "find_overheating",
+          "input": {
+            "source": "virtual_sensor",
+            "threshold_c": 100,
+            "component": "magnet"
+          },
+          "error": false
+        }
+      ],
+      "seconds": 8.5,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "peak_74",
+      "question": "What was the peak measured magnet temperature in drive cycle 74?",
+      "passed": true,
+      "checks": {
+        "number_0=91.9": true,
+        "tool:get_cycle_summary": true
+      },
+      "answer": "The peak measured magnet temperature in drive cycle 74 was 91.9\u00b0C.",
+      "tool_calls": [
+        {
+          "name": "get_cycle_summary",
+          "input": {
+            "profile_id": 74
+          },
+          "error": false
+        }
+      ],
+      "seconds": 5.6,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "error_60",
+      "question": "What is the virtual sensor's maximum magnet error on drive cycle 60?",
+      "passed": true,
+      "checks": {
+        "number_0=3.45": true,
+        "tool:get_cycle_summary": true
+      },
+      "answer": "The virtual sensor's maximum absolute error for the magnet temperature on drive cycle 60 is 3.45 K.\n\nThis cycle belongs to the test split, meaning it was not used during the training of the virtual sensor. The peak measured magnet temperature during this cycle was 85.1 \u00b0C, while the peak estimated temperature was 85.5 \u00b0C.",
+      "tool_calls": [
+        {
+          "name": "get_cycle_summary",
+          "input": {
+            "profile_id": 60
+          },
+          "error": false
+        }
+      ],
+      "seconds": 5.3,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "whatif_coolant",
+      "question": "In drive cycle 62, how much would the peak magnet temperature change if the coolant were 10 \u00b0C warmer?",
+      "passed": true,
+      "checks": {
+        "number_0=4.9": true,
+        "tool:what_if": true
+      },
+      "answer": "In drive cycle 62, increasing the coolant temperature by 10 \u00b0C results in a peak magnet temperature increase of 4.9 \u00b0C. The estimated peak magnet temperature rises from 76.6 \u00b0C to 81.5 \u00b0C.\n\nPlease note that these results are model estimates and not measurements. Furthermore, as indicated by the tool, scaling currents does not re-solve the motor control, meaning voltages and motor speed remain unchanged in this simulation.",
+      "tool_calls": [
+        {
+          "name": "what_if",
+          "input": {
+            "coolant_delta_c": 10,
+            "profile_id": 62
+          },
+          "error": false
+        }
+      ],
+      "seconds": 5.9,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "whatif_current",
+      "question": "Estimate the peak magnet temperature in drive cycle 74 if the phase currents were 30% higher.",
+      "passed": true,
+      "checks": {
+        "number_0=96.2": true,
+        "text_0": true,
+        "tool:what_if": true
+      },
+      "answer": "If phase currents are increased by 30% in drive cycle 74, the estimated peak magnet temperature is **96.2\u00b0C**, compared to the baseline peak of 92.7\u00b0C.\n\nPlease note the following important caveats:\n*   **Extrapolation Warning:** These scaled currents exceed the range of the training data, meaning the result is an extrapolation and should be treated with caution.\n*   **Model Nature:** These are virtual sensor estimates, not measurements.\n*   **Simulation Constraints:** Scaling the currents does not re-solve motor control, so voltage and motor speed remain unchanged from the original cycle.",
+      "tool_calls": [
+        {
+          "name": "what_if",
+          "input": {
+            "profile_id": 74,
+            "current_scale": 1.3
+          },
+          "error": false
+        }
+      ],
+      "seconds": 5.9,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "longest",
+      "question": "Which drive cycle is the longest, and how long is it in minutes?",
+      "passed": true,
+      "checks": {
+        "ids_present": true,
+        "number_0=366.4": true,
+        "tool:list_drive_cycles": true
+      },
+      "answer": "The longest drive cycle is **profile_id 20**, which has a duration of **366.4 minutes**.",
+      "tool_calls": [
+        {
+          "name": "list_drive_cycles",
+          "input": {},
+          "error": false
+        }
+      ],
+      "seconds": 5.8,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "hot_restarts",
+      "question": "Which drive cycles start with the magnet at least 10 K hotter than the coolant?",
+      "passed": true,
+      "checks": {
+        "ids_present": true,
+        "tool:find_hot_restarts": true
+      },
+      "answer": "There are three drive cycles where the magnet is at least 10 K hotter than the coolant at the start:\n\n| Profile ID | Magnet Start (\u00b0C) | Coolant Start (\u00b0C) | Difference (K) | Split |\n| :--- | :--- | :--- | :--- | :--- |\n| 53 | 50.6 | 18.6 | 32.0 | validation |\n| 47 | 72.3 | 49.8 | 22.5 | train |\n| 48 | 59.9 | 49.8 | 10.0 | validation |\n\nPlease note that cycles in the \"train\" and \"validation\" splits were seen during the development of the virtual sensor, so accuracy estimates for these cycles may be optimistic.",
+      "tool_calls": [
+        {
+          "name": "find_hot_restarts",
+          "input": {
+            "min_delta_k": 10
+          },
+          "error": false
+        }
+      ],
+      "seconds": 5.9,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "winding_130",
+      "question": "Which drive cycles had a measured stator winding temperature above 130 \u00b0C?",
+      "passed": true,
+      "checks": {
+        "ids_present": true,
+        "tool:find_overheating": true
+      },
+      "answer": "There are 10 drive cycles where the measured stator winding temperature exceeded 130 \u00b0C. The following table summarizes these cycles, ordered by the total duration spent above the threshold:\n\n| Profile ID | Split | Peak Measured Temp (\u00b0C) | Minutes Above 130 \u00b0C |\n| :--- | :--- | :--- | :--- |\n| 29 | train | 141.4 | 10.6 |\n| 32 | train | 131.4 | 6.9 |\n| 36 | train | 133.8 | 1.7 |\n| 27 | train | 138.6 | 1.0 |\n| 56 | train | 131.7 | 0.9 |\n| 59 | train | 132.7 | 0.8 |\n| 73 | train | 131.6 | 0.6 |\n| 57 | train | 131.6 | 0.4 |\n| 58 | validation | 131.2 | 0.3 |\n| 75 | train | 130.1 | 0.1 |\n\nPlease note that most of these cycles are from the training split, meaning the virtual sensor has seen these data during its development, which may lead to optimistic accuracy expectations for these specific cases. Cycle 58 is from the validation split.",
+      "tool_calls": [
+        {
+          "name": "find_overheating",
+          "input": {
+            "source": "measured",
+            "threshold_c": 130,
+            "component": "stator_winding"
+          },
+          "error": false
+        }
+      ],
+      "seconds": 6.6,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "speed_65",
+      "question": "What is the maximum motor speed in drive cycle 65?",
+      "passed": true,
+      "checks": {
+        "number_0=5960": true,
+        "tool:get_cycle_summary|list_drive_cycles": true
+      },
+      "answer": "The maximum motor speed in drive cycle 65 is 5960.2 rpm.",
+      "tool_calls": [
+        {
+          "name": "list_drive_cycles",
+          "input": {},
+          "error": false
+        }
+      ],
+      "seconds": 5.8,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "accuracy_vs_published",
+      "question": "How accurate is the virtual sensor compared with the best published model?",
+      "passed": true,
+      "checks": {
+        "number_0=1.5": true,
+        "number_1=2.87": true,
+        "tool:model_card": true
+      },
+      "answer": "The virtual sensor outperforms the best published model on the provided test dataset (profiles 60, 62, and 74). \n\n| Metric | Virtual Sensor | Best Published Model |\n| :--- | :--- | :--- |\n| Mean Squared Error (MSE) | 1.5 K\u00b2 | 2.87 K\u00b2 |\n| Max Absolute Error | 5.73 K | 6.02 K |\n\nThese results are based on the test split. Please note that accuracy on training and validation cycles is typically more optimistic than on this test set. Additionally, these estimates are specific to the Paderborn University LEA PMSM test bench; other motors would require re-training of the model.",
+      "tool_calls": [
+        {
+          "name": "model_card",
+          "input": {},
+          "error": false
+        }
+      ],
+      "seconds": 6.3,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "nonexistent_cycle",
+      "question": "What was the peak magnet temperature in drive cycle 999?",
+      "passed": true,
+      "checks": {
+        "text_0": true,
+        "no:\u00b0C": true
+      },
+      "answer": "Drive cycle 999 does not exist. The available drive cycles range from ID 2 to 81. Please provide a valid cycle ID.",
+      "tool_calls": [
+        {
+          "name": "get_cycle_summary",
+          "input": {
+            "profile_id": 999
+          },
+          "error": true
+        }
+      ],
+      "seconds": 5.3,
+      "stop_reason": "completed"
+    },
+    {
+      "id": "out_of_scope",
+      "question": "Predict the remaining useful life of the motor bearings for drive cycle 20.",
+      "passed": true,
+      "checks": {
+        "text_0": true,
+        "no:hours remaining": true,
+        "no:remaining useful life is": true
+      },
+      "answer": "I do not have access to data regarding the remaining useful life of the motor bearings. My available tools are limited to analyzing temperatures (magnet, stator yoke, stator tooth, and stator winding) for the permanent-magnet synchronous motor (PMSM) and performing thermal what-if simulations.",
+      "tool_calls": [],
+      "seconds": 2.8,
+      "stop_reason": "completed"
+    }
+  ]
+}

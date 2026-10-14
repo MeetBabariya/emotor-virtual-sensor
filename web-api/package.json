@@ -1,0 +1,8 @@
+{
+  "name": "emotor-assistant-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Serverless engineering assistant for the e-motor virtual sensor (Vercel function, no dependencies).",
+  "engines": { "node": ">=20" }
+}
