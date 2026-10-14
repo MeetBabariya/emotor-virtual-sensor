@@ -2,14 +2,14 @@
 
 Estimating the rotor-magnet and stator temperatures of an electric-vehicle motor (PMSM) from signals a car can actually measure — and an LLM assistant that answers engineering questions by calling the model.
 
-**Interactive case study:** [meetbabariya.github.io/work/emotor-virtual-sensor](https://meetbabariya.github.io/work/emotor-virtual-sensor/) — explore the test cycles, the hot-restart slider, what-if scenarios and the recorded assistant runs in your browser.
+**Interactive case study:** [meetbabariya.github.io/work/emotor-virtual-sensor](https://meetbabariya.github.io/work/emotor-virtual-sensor/) — explore the test cycles, the hot-restart slider and what-if scenarios, and **ask the assistant live** (serverless on Vercel, evaluated 13/13 in production) in your browser.
 
 | | This project | Best published model |
 |---|---|---|
 | Average error on unseen test cycles (MSE, 4 temperatures) | **1.50 K²** | 2.87 K² |
 | Worst-case error | **5.73 K** | 6.02 K |
 | Uses torque as an input | **no** (not measurable in a car) | yes |
-| Assistant evaluation | **13 / 13** questions correct | — |
+| Assistant evaluation (local and production) | **13 / 13** questions correct | — |
 
 Published numbers: Kirchgässner, Wallscheid & Böcker, *Thermal neural networks*, Engineering Applications of AI (2023), Table III — same generalization cycles (60, 62, 74).
 
@@ -29,7 +29,7 @@ All three official test cycles start with a cool motor. Real cars **restart hot*
 2. **Ridge regression + start-of-run correction.** A known initial temperature removes the model's start bias, which then decays with a time constant chosen by cross-validation (≈15 min magnet, 5 min stator — the rotor is less directly cooled).
 3. **Thermal Neural Network** (PyTorch). A lumped heat-flow network whose power losses and thermal conductances are small neural networks, integrated every 0.5 s from the initial temperature (architecture after the dataset authors; [reference code](https://github.com/wkirgsn/thermal-nn)).
 4. **Ensemble.** The two models' errors are anti-correlated, so their mean (1.50 K²) beats both (2.09 / 2.70 K²).
-5. **Assistant.** An LLM (Gemini free tier by default, Claude switchable) answers questions by calling six deterministic tools — cycle summaries, overheating search, hot-restart detection, what-if simulation, model card. Every number comes from code.
+5. **Assistant.** An LLM (Gemini free tier by default, Claude switchable) answers questions by calling six deterministic tools — cycle summaries, overheating search, hot-restart detection, what-if simulation, model card. Every number comes from code. The same loop runs as a dependency-free serverless function on Vercel ([web-api/](web-api/)) behind the live chat.
 
 ## Evaluation discipline
 
