@@ -4,13 +4,13 @@ import { TOOL_SCHEMAS, runTool } from './tools.js';
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/interactions';
 // Free-tier models tried in order when one is overloaded (503) or rate-limited (429).
-export const MODELS = (process.env.GEMINI_MODELS ?? 'gemini-3.1-flash-lite,gemini-3.1-flash-lite-preview,gemini-3-flash-preview,gemini-3.5-flash-lite')
+export const MODELS = (process.env.GEMINI_MODELS ?? 'gemini-3.1-flash-lite,gemini-3.1-flash-lite-preview,gemini-3.5-flash-lite,gemini-3-flash-preview')
   .split(',').map((m) => m.trim()).filter(Boolean);
 export const MODEL = MODELS[0];
 const RETRYABLE = new Set([429, 500, 503]);
 const MAX_TURNS = 6;
-const REQUEST_TIMEOUT_MS = 20_000;
-const START_BUDGET_MS = 30_000; // time allowed for finding an available model (function limit is 60 s)
+const REQUEST_TIMEOUT_MS = 25_000; // gemini-3.5-flash-lite can take ~10 s per call
+const START_BUDGET_MS = 25_000; // time allowed for finding an available model (function limit is 60 s)
 
 export const SYSTEM = `You are an engineering assistant for a thermal virtual sensor on a permanent-magnet synchronous motor (PMSM) used in electric vehicles. Engineers ask about drive cycles, temperatures, overheating risk and what-if scenarios.
 
