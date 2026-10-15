@@ -1,5 +1,7 @@
 # E-motor virtual temperature sensor + engineering assistant
 
+[![CI](https://github.com/MeetBabariya/emotor-virtual-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/MeetBabariya/emotor-virtual-sensor/actions/workflows/ci.yml)
+
 Estimating the rotor-magnet and stator temperatures of an electric-vehicle motor (PMSM) from signals a car can actually measure — and an LLM assistant that answers engineering questions by calling the model.
 
 **Interactive case study:** [meetbabariya.github.io/work/emotor-virtual-sensor](https://meetbabariya.github.io/work/emotor-virtual-sensor/) — explore the test cycles, the hot-restart slider and what-if scenarios, and **ask the assistant live** (serverless on Vercel, evaluated 13/13 in production) in your browser.
@@ -48,6 +50,20 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env            # add a free GEMINI_API_KEY for live assistant questions
 streamlit run app.py            # demo uses artifacts/ (24 MB), no dataset download needed
+```
+
+Or with Docker (CPU-only image, same app):
+
+```bash
+docker build -t emotor-virtual-sensor .
+docker run -p 8501:8501 -e GEMINI_API_KEY=... emotor-virtual-sensor
+```
+
+Tests (also run by GitHub Actions on every push, together with a Docker build and health check):
+
+```bash
+python -m pytest -q tests            # Python tools + virtual sensor
+node --test web-api/test/*.test.mjs  # serverless API tools
 ```
 
 Reproduce the models (needs the Kaggle dataset in `data/`):

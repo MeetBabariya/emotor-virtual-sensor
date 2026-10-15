@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python-tests:
+    name: Python tests (tools + virtual sensor)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install dependencies (CPU PyTorch)
+        run: |
+          pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt pytest
+      - name: Run tests
+        run: python -m pytest -q tests
+
+  api-tests:
+    name: Serverless API tests (Node)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: node --check web-api/api/ask.js && node --check web-api/lib/agent.js && node --check web-api/lib/tools.js
+      - name: Run tests
+        run: node --test web-api/test/*.test.mjs
+
+  docker:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    needs: python-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: docker build -t emotor-virtual-sensor:ci .
+      - name: Smoke test (container starts and reports healthy)
+        run: |
+          docker run -d --name app -p 8501:8501 emotor-virtual-sensor:ci
+          for i in $(seq 1 30); do
+            if curl -fs http://localhost:8501/_stcore/health; then echo " healthy"; exit 0; fi
+            sleep 3
+          done
+          docker logs app; exit 1
