@@ -9,7 +9,8 @@ export const MODELS = (process.env.GEMINI_MODELS ?? 'gemini-3.1-flash-lite,gemin
 export const MODEL = MODELS[0];
 const RETRYABLE = new Set([429, 500, 503]);
 const MAX_TURNS = 6;
-const REQUEST_TIMEOUT_MS = 25_000;
+const REQUEST_TIMEOUT_MS = 20_000;
+const START_BUDGET_MS = 30_000; // time allowed for finding an available model (function limit is 60 s)
 
 export const SYSTEM = `You are an engineering assistant for a thermal virtual sensor on a permanent-magnet synchronous motor (PMSM) used in electric vehicles. Engineers ask about drive cycles, temperatures, overheating risk and what-if scenarios.
 
@@ -42,16 +43,22 @@ async function call(apiKey, model, body) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** First turn: walk the model list until one answers. Returns the interaction and the model used. */
+/** First turn: walk the model list until one answers; if all are busy, pause and make a second
+ *  pass (free-tier overload usually clears within seconds). Returns the interaction and model. */
 async function start(apiKey, question) {
+  const t0 = Date.now();
   let last;
-  for (const model of MODELS) {
-    try {
-      return { interaction: await call(apiKey, model, { input: question }), model };
-    } catch (e) {
-      last = e;
-      if (!(e instanceof UpstreamError) || !RETRYABLE.has(e.status)) throw e;
-      console.warn(`model ${model} unavailable (${e.status}); trying next`);
+  for (let pass = 0; pass < 2; pass++) {
+    if (pass) await sleep(2500);
+    for (const model of MODELS) {
+      if (Date.now() - t0 > START_BUDGET_MS) throw last;
+      try {
+        return { interaction: await call(apiKey, model, { input: question }), model };
+      } catch (e) {
+        last = e;
+        if (!(e instanceof UpstreamError) || !RETRYABLE.has(e.status)) throw e;
+        console.warn(`model ${model} unavailable (${e.status}); trying next`);
+      }
     }
   }
   throw last;
