@@ -5,7 +5,7 @@
  *  - question length cap
  *  - per-IP and per-instance rate limits (in-memory; best effort on serverless)
  */
-import { ask, UpstreamError, MODEL } from '../lib/agent.js';
+import { ask, UpstreamError, MODEL, MODELS } from '../lib/agent.js';
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? 'https://meetbabariya.github.io,http://localhost:4322')
   .split(',').map((s) => s.trim());
@@ -49,7 +49,7 @@ async function readJson(req) {
 export default async function handler(req, res) {
   setCors(req, res);
   if (req.method === 'OPTIONS') return res.status(204).end();
-  if (req.method === 'GET') return res.status(200).json({ ok: true, model: MODEL, usage: 'POST {"question": "..."}' });
+  if (req.method === 'GET') return res.status(200).json({ ok: true, model: MODEL, fallbacks: MODELS.slice(1), usage: 'POST {"question": "..."}' });
   if (req.method !== 'POST') return res.status(405).json({ error: 'Use POST.' });
 
   const origin = req.headers.origin;
@@ -75,7 +75,10 @@ export default async function handler(req, res) {
   try {
     return res.status(200).json(await ask(question, apiKey));
   } catch (e) {
-    if (e instanceof UpstreamError) return res.status(e.status === 429 ? 429 : 502).json({ error: e.message });
+    if (e instanceof UpstreamError) {
+      const busy = e.status === 503 || e.status === 429;
+      return res.status(busy ? 503 : 502).json({ error: busy ? 'All free models are busy right now. Please try again in a minute — the recorded runs below show real answers.' : e.message });
+    }
     if (e?.name === 'TimeoutError') return res.status(504).json({ error: 'The model took too long to answer. Please try again.' });
     console.error(e);
     return res.status(500).json({ error: 'Unexpected server error.' });

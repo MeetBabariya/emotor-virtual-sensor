@@ -3,7 +3,11 @@
 import { TOOL_SCHEMAS, runTool } from './tools.js';
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/interactions';
-export const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.1-flash-lite';
+// Free-tier models tried in order when one is overloaded (503) or rate-limited (429).
+export const MODELS = (process.env.GEMINI_MODELS ?? 'gemini-3.1-flash-lite,gemini-3.1-flash-lite-preview,gemini-3-flash-preview,gemini-3.5-flash-lite')
+  .split(',').map((m) => m.trim()).filter(Boolean);
+export const MODEL = MODELS[0];
+const RETRYABLE = new Set([429, 500, 503]);
 const MAX_TURNS = 6;
 const REQUEST_TIMEOUT_MS = 25_000;
 
@@ -21,11 +25,11 @@ export class UpstreamError extends Error {
   constructor(message, status) { super(message); this.status = status; }
 }
 
-async function call(apiKey, body) {
+async function call(apiKey, model, body) {
   const res = await fetch(ENDPOINT, {
     method: 'POST',
     headers: { 'x-goog-api-key': apiKey, 'content-type': 'application/json' },
-    body: JSON.stringify({ model: MODEL, system_instruction: SYSTEM, tools: TOOL_SCHEMAS, ...body }),
+    body: JSON.stringify({ model, system_instruction: SYSTEM, tools: TOOL_SCHEMAS, ...body }),
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   const data = await res.json().catch(() => ({}));
@@ -36,11 +40,39 @@ async function call(apiKey, body) {
   return data;
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** First turn: walk the model list until one answers. Returns the interaction and the model used. */
+async function start(apiKey, question) {
+  let last;
+  for (const model of MODELS) {
+    try {
+      return { interaction: await call(apiKey, model, { input: question }), model };
+    } catch (e) {
+      last = e;
+      if (!(e instanceof UpstreamError) || !RETRYABLE.has(e.status)) throw e;
+      console.warn(`model ${model} unavailable (${e.status}); trying next`);
+    }
+  }
+  throw last;
+}
+
+/** Later turns must stay on the same model (previous_interaction_id); retry once on a transient error. */
+async function continueWith(apiKey, model, body) {
+  try {
+    return await call(apiKey, model, body);
+  } catch (e) {
+    if (!(e instanceof UpstreamError) || !RETRYABLE.has(e.status)) throw e;
+    await sleep(1500);
+    return call(apiKey, model, body);
+  }
+}
+
 export async function ask(question, apiKey) {
   const t0 = Date.now();
   const toolCalls = [];
   let inTok = 0, outTok = 0;
-  let interaction = await call(apiKey, { input: question });
+  let { interaction, model } = await start(apiKey, question);
   for (let turn = 0; turn < MAX_TURNS; turn++) {
     inTok += interaction.usage?.total_input_tokens ?? 0;
     outTok += (interaction.usage?.total_output_tokens ?? 0) + (interaction.usage?.total_thought_tokens ?? 0);
@@ -52,14 +84,14 @@ export async function ask(question, apiKey) {
         .flatMap((s) => (s.content ?? []).filter((c) => c.type === 'text').map((c) => c.text))
         .join('\n')
         .trim();
-      return { answer, tool_calls: toolCalls, seconds: (Date.now() - t0) / 1000, model: MODEL, input_tokens: inTok, output_tokens: outTok };
+      return { answer, tool_calls: toolCalls, seconds: (Date.now() - t0) / 1000, model, input_tokens: inTok, output_tokens: outTok };
     }
     const results = calls.map((c) => {
       const { output, isError } = runTool(c.name, c.arguments ?? {});
       toolCalls.push({ name: c.name, input: c.arguments ?? {}, error: isError });
       return { type: 'function_result', name: c.name, call_id: c.id, result: [{ type: 'text', text: output }], is_error: isError };
     });
-    interaction = await call(apiKey, { input: results, previous_interaction_id: interaction.id });
+    interaction = await continueWith(apiKey, model, { input: results, previous_interaction_id: interaction.id });
   }
-  return { answer: 'Stopped: too many tool-call rounds without a final answer.', tool_calls: toolCalls, seconds: (Date.now() - t0) / 1000, model: MODEL, input_tokens: inTok, output_tokens: outTok };
+  return { answer: 'Stopped: too many tool-call rounds without a final answer.', tool_calls: toolCalls, seconds: (Date.now() - t0) / 1000, model, input_tokens: inTok, output_tokens: outTok };
 }

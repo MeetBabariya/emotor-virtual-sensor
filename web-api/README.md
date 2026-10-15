@@ -33,7 +33,7 @@ Inputs between precomputed values are snapped, and the tool tells the model it d
 | name | purpose |
 |---|---|
 | `GEMINI_API_KEY` | free Google AI Studio key (required) |
-| `GEMINI_MODEL` | defaults to `gemini-3.1-flash-lite` |
+| `GEMINI_MODELS` | comma-separated fallback chain, default `gemini-3.1-flash-lite,gemini-3.1-flash-lite-preview,gemini-3-flash-preview,gemini-3.5-flash-lite`: if a free model is overloaded (503) or rate-limited (429) the next one answers |
 | `ALLOWED_ORIGINS` | comma-separated, default `https://meetbabariya.github.io,http://localhost:4322` |
 | `EVAL_TOKEN` | optional; lets `python -m src.eval_assistant --endpoint …` skip the rate limit |
 
