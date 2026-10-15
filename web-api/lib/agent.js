@@ -7,10 +7,10 @@ const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/interactions'
 export const MODELS = (process.env.GEMINI_MODELS ?? 'gemini-3.1-flash-lite,gemini-3.1-flash-lite-preview,gemini-3.5-flash-lite,gemini-3-flash-preview')
   .split(',').map((m) => m.trim()).filter(Boolean);
 export const MODEL = MODELS[0];
-const RETRYABLE = new Set([429, 500, 503]);
+const RETRYABLE = new Set([429, 500, 503, 504]); // 504 = our own per-call timeout
 const MAX_TURNS = 6;
-const REQUEST_TIMEOUT_MS = 25_000; // gemini-3.5-flash-lite can take ~10 s per call
-const START_BUDGET_MS = 25_000; // time allowed for finding an available model (function limit is 60 s)
+const REQUEST_TIMEOUT_MS = 18_000; // a slow model is abandoned for the next one in the chain
+const START_BUDGET_MS = 36_000; // keeps the worst case under the 60 s function limit // time allowed for finding an available model (function limit is 60 s)
 
 export const SYSTEM = `You are an engineering assistant for a thermal virtual sensor on a permanent-magnet synchronous motor (PMSM) used in electric vehicles. Engineers ask about drive cycles, temperatures, overheating risk and what-if scenarios.
 
@@ -27,12 +27,18 @@ export class UpstreamError extends Error {
 }
 
 async function call(apiKey, model, body) {
-  const res = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: { 'x-goog-api-key': apiKey, 'content-type': 'application/json' },
-    body: JSON.stringify({ model, system_instruction: SYSTEM, tools: TOOL_SCHEMAS, ...body }),
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
+  let res;
+  try {
+    res = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'x-goog-api-key': apiKey, 'content-type': 'application/json' },
+      body: JSON.stringify({ model, system_instruction: SYSTEM, tools: TOOL_SCHEMAS, ...body }),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+  } catch (e) {
+    if (e?.name === 'TimeoutError') throw new UpstreamError(`${model} did not answer within ${REQUEST_TIMEOUT_MS / 1000} s`, 504);
+    throw e;
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     const msg = data?.error?.message ?? `HTTP ${res.status}`;

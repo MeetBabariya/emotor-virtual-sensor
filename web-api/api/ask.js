@@ -76,7 +76,7 @@ export default async function handler(req, res) {
     return res.status(200).json(await ask(question, apiKey));
   } catch (e) {
     if (e instanceof UpstreamError) {
-      const busy = e.status === 503 || e.status === 429;
+      const busy = e.status === 503 || e.status === 429 || e.status === 504;
       return res.status(busy ? 503 : 502).json({ error: busy ? 'All free models are busy right now. Please try again in a minute — the recorded runs below show real answers.' : e.message });
     }
     if (e?.name === 'TimeoutError') return res.status(504).json({ error: 'The model took too long to answer. Please try again.' });
